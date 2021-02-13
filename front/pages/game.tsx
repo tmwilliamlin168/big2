@@ -6,4 +6,6 @@ export default function Game() {
 		const socket = io(process.env.NEXT_PUBLIC_BACK_HOST!);
 		return () => {socket.close()};
 	}, []);
+
+	return null;
 }
