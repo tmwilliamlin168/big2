@@ -8,7 +8,10 @@ const server = new Server({cors: {origin: process.env.ORIGIN, methods: ['GET', '
 server.on('connection', (socket: Socket) => {
 	console.log('client connect', socket.id);
 	socket.on('login', username => {
-		console.log('login', username);
+		if (typeof username !== 'string' || username.length < 1 || username.length > 15) {
+			socket.disconnect();
+			return;
+		}
 		socket.emit('loginRes', {success: true});
 	});
 	socket.on('disconnect', () => console.log('disconnect'))
