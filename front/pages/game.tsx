@@ -48,18 +48,15 @@ export default function Game() {
 	const [username, setUsername] = useState(null);
 
 	useEffect(() => {
-		if(!socket) {
-			console.log('create');
-			setSocket(io(process.env.NEXT_PUBLIC_BACK_HOST!));
-			return;
-		}
+		const socket = io(process.env.NEXT_PUBLIC_BACK_HOST!);
+		setSocket(socket);
 		socket.on('connect', () => setConnected(true));
 		socket.on('disconnect', () => {
 			setConnected(false);
 			setLoggedIn(false);
 		});
-		return () => {socket.close(); alert('plz reload')};
-	}, [socket]);
+		return () => {socket.close()};
+	}, []);
 
 	if (!socket) return null;
 	if (!loggedIn) {
