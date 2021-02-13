@@ -1,7 +1,7 @@
 import {useEffect, useState} from 'react';
-import io, {Socket} from 'socket.io-client';
+import io from 'socket.io-client';
 
-const LoginForm = ({finish, socket, username}: {finish: (s: string) => void, socket: Socket, username: string | null}) => {
+const LoginForm = ({finish, socket, username}: {finish: (s: string) => void, socket: SocketIOClient.Socket, username: string | null}) => {
 	const [value, setValue] = useState(username || '');
 	const [waiting, setWaiting] = useState(false);
 	const [error, setError] = useState('');
@@ -9,12 +9,12 @@ const LoginForm = ({finish, socket, username}: {finish: (s: string) => void, soc
 	const login = () => {
 		setWaiting(true);
 		socket.emit('login', value);
-		socket.once('loginRes', data => {
+		socket.once('loginRes', (data: {success: boolean; error?: string}) => {
 			setWaiting(false);
 			if(data.success)
 				finish(value);
 			else
-				setError(data.error);
+				setError(data.error!);
 		});
 	};
 
@@ -42,10 +42,10 @@ const LoginForm = ({finish, socket, username}: {finish: (s: string) => void, soc
 };
 
 export default function Game() {
-	const [socket, setSocket] = useState(null);
+	const [socket, setSocket] = useState<SocketIOClient.Socket | null>(null);
 	const [connected, setConnected] = useState(false);
 	const [loggedIn, setLoggedIn] = useState(false);
-	const [username, setUsername] = useState(null);
+	const [username, setUsername] = useState<string | null>(null);
 
 	useEffect(() => {
 		const socket = io(process.env.NEXT_PUBLIC_BACK_HOST!);
