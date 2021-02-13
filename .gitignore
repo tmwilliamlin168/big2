@@ -1,4 +1,5 @@
 /front/node_modules
 /front/.next
+/front/.env
 
 /back/node_modules
