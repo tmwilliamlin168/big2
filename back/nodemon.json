@@ -1,0 +1,5 @@
+{
+	"ext": "js, ts, json",
+	"exec": "npm run dev2 || exit 1",
+	"ignore": ["dist/*"]
+}
