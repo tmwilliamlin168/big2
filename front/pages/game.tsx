@@ -64,6 +64,7 @@ export default function Game() {
 			setRoom(null);
 		});
 		socket.on('joinRoom', (data: {name: string}) => setRoom(data.name));
+		socket.on('leaveRoom', () => setRoom(null));
 		socket.on('roomUpdate', (data: {users: string[], host: string}) => {
 			setRoomUsers(data.users);
 			setRoomHost(data.host);

@@ -51,6 +51,8 @@ server.on('connection', (socket: Socket) => {
 			clearTimeout(client.disconnectTimeout!);
 			client.socket = socket;
 			socket.emit('loginRes', {success: true});
+			if (client.room)
+				client.room.addSocket(client);
 			logSocket(socket, 'Reconnect login successful');
 		} else {
 			client = new Client(newClientId++, username, socket);
@@ -152,9 +154,11 @@ server.on('connection', (socket: Socket) => {
 		logSocket(socket, 'Disconnect');
 		if (!client) return;
 		client.disconnectTimeout = setTimeout(() => {
+			client = client as Client;
+			if (client.room) client.room.remove(client);
 			logSocket(socket, 'Full disconnect');
-			clients.delete(client!.id);
-			usernameToId.delete(client!.username);
+			clients.delete(client.id);
+			usernameToId.delete(client.username);
 		}, 60000);
 	});
 });
