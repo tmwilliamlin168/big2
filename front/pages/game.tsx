@@ -65,6 +65,7 @@ export default function Game() {
 				{roomUsers.map(user => <li>{user + (user === roomHost ? ' (Host)':'')}</li>)}
 			</ul>
 			<button onClick={() => socket.emit('leaveRoom')}>Leave</button>
+			{username === roomHost && <button onClick={() => socket.emit('startGame')}>Start</button>}
 		</>
 	);
 }

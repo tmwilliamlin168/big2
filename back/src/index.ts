@@ -4,12 +4,9 @@ import {Socket} from 'socket.io';
 dotenv.config();
 
 import Client from './Client';
+import logSocket from './logSocket';
 import Room from './Room';
 import server from './server';
-
-const logSocket = (socket: Socket, s: string) => {
-	console.log(`[${socket.id}, ${socket.handshake.address}] ${s}`);
-};
 
 let newClientId = 0;
 const clients = new Map();
