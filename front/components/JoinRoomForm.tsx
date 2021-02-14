@@ -11,7 +11,7 @@ export default function JoinRoomForm({socket, finish} : {socket: SocketIOClient.
 			<p>Join Room</p>
 			<input
 				type="text"
-				maxLength="15"
+				maxLength={15}
 				placeholder="Room name..."
 				value={name}
 				onChange={(e) => setName(e.target.value)}
@@ -19,7 +19,7 @@ export default function JoinRoomForm({socket, finish} : {socket: SocketIOClient.
 			/>
 			<input
 				type="text"
-				maxLength="15"
+				maxLength={15}
 				placeholder="Password..."
 				value={password}
 				onChange={(e) => setPassword(e.target.value)}
