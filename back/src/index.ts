@@ -15,8 +15,6 @@ let newClientId = 0;
 const clients = new Map();
 const usernameToId = new Map();
 
-const rooms = new Map();
-
 server.on('connection', (socket: Socket) => {
 	logSocket(socket, 'Connect');
 	let client: Client | null = null;
@@ -88,11 +86,11 @@ server.on('connection', (socket: Socket) => {
 				return;
 			}
 			// Make sure room exists
-			if (!rooms.has(name)) {
+			if (!Room.get(name)) {
 				socket.emit('joinRoomRes', {success: false, error: `Room "${name}" does not exist`});
 				return;
 			}
-			const room = rooms.get(name);
+			const room = Room.get(name);
 			// Make sure password is correct
 			if (password !== room.password) {
 				socket.emit('joinRoomRes', {success: false, error: 'Password is incorrect'});
@@ -139,14 +137,13 @@ server.on('connection', (socket: Socket) => {
 				return;
 			}
 			// Make sure room does not exist
-			if (rooms.has(name)) {
+			if (Room.get(name)) {
 				socket.emit('createRoomRes', {success: false, error: `Room "${name}" already exists`});
 				return;
 			}
 			// Success
 			socket.emit('createRoomRes', {success: true});
-			const room = new Room(name, password, client);
-			rooms.set(name, room);
+			new Room(name, password, client);
 		});
 	});
 

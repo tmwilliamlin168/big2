@@ -2,6 +2,10 @@ import Client from './Client';
 import server from './server';
 
 export default class Room {
+	static rooms = new Map();
+	static get(name: string) {
+		return this.rooms.get(name);
+	}
 	name: string;
 	password: string;
 	clients: Client[] = [];
@@ -12,6 +16,7 @@ export default class Room {
 		this.password = password;
 		this.host = host;
 		this.add(host);
+		Room.rooms.set(name, this);
 	}
 	add(client: Client) {
 		this.clients.push(client);
@@ -31,7 +36,10 @@ export default class Room {
 		client.room = null;
 		client.socket.leave(this.name);
 		client.socket.emit('leaveRoom');
-		if (!this.clients.length) return;
+		if (!this.clients.length) {
+			Room.rooms.delete(this.name);
+			return;
+		}
 		if (this.host === client)
 			this.host = this.clients[0];
 		server.to(this.name).emit('roomUpdate', {
