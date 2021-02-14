@@ -1,4 +1,5 @@
 import Client from './Client';
+import Game from './Game';
 import logSocket from './logSocket';
 import server from './server';
 
@@ -11,7 +12,7 @@ export default class Room {
 	password: string;
 	clients: Client[] = [];
 	host: Client;
-	running: boolean = false;
+	game: Game | null = null;
 	constructor(name: string, password: string, host: Client) {
 		this.name = name;
 		this.password = password;
@@ -46,7 +47,7 @@ export default class Room {
 		if (this.host === client) {
 			this.host.socket.removeAllListeners('startGame');
 			this.host = this.clients[0];
-			if (!this.running)
+			if (!this.game)
 				this.host.socket.once('startGame', () => this.startGame());
 		}
 		server.to(this.name).emit('roomUpdate', {
@@ -60,7 +61,7 @@ export default class Room {
 			logSocket(this.host.socket, 'Not enough users for startGame');
 			return;
 		}
-		this.running = true;
+		this.game = new Game();
 		console.log('game started '+this.name);
 	}
 };

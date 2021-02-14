@@ -94,7 +94,7 @@ server.on('connection', (socket: Socket) => {
 				return;
 			}
 			// Make sure game has not yet started
-			if (room.running) {
+			if (room.game) {
 				socket.emit('joinRoomRes', {success: false, error: 'The game has already started'});
 				return;
 			}
