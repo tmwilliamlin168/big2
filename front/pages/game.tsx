@@ -14,7 +14,7 @@ const LoginForm = ({finish, socket, username}: {finish: (s: string) => void, soc
 		socket.emit('login', value);
 		socket.once('loginRes', (data: {success: boolean; error?: string}) => {
 			setWaiting(false);
-			if(data.success)
+			if (data.success)
 				finish(value);
 			else
 				setError(data.error!);
@@ -62,9 +62,8 @@ export default function Game() {
 			setConnected(false);
 			setLoggedIn(false);
 			setRoom(null);
-			setRoomUsers([]);
-			setRoomHost('');
 		});
+		socket.on('joinRoom', (data: {name: string}) => setRoom(data.name));
 		socket.on('roomUpdate', (data: {users: string[], host: string}) => {
 			setRoomUsers(data.users);
 			setRoomHost(data.host);
@@ -90,15 +89,9 @@ export default function Game() {
 			<>
 				<p>Logged in as {username}</p>
 				<hr />
-				<JoinRoomForm
-					socket={socket}
-					finish={setRoom}
-				/>
+				<JoinRoomForm socket={socket} />
 				<hr />
-				<CreateRoomForm
-					socket={socket}
-					finish={setRoom}
-				/>
+				<CreateRoomForm socket={socket} />
 			</>
 		);
 	}

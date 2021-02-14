@@ -1,6 +1,6 @@
 import {useState} from 'react';
 
-export default function JoinRoomForm({socket, finish} : {socket: SocketIOClient.Socket; finish: (s: string) => void}) {
+export default function JoinRoomForm({socket} : {socket: SocketIOClient.Socket}) {
 	const [name, setName] = useState('');
 	const [password, setPassword] = useState('');
 	const [waiting, setWaiting] = useState(false);
@@ -31,9 +31,7 @@ export default function JoinRoomForm({socket, finish} : {socket: SocketIOClient.
 					socket.emit('joinRoom', name, password);
 					socket.once('joinRoomRes', (data: {success: boolean; error?: string}) => {
 						setWaiting(false);
-						if(data.success)
-							finish(name);
-						else
+						if (!data.success)
 							setError(data.error!);
 					});
 				}}
