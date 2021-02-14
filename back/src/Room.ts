@@ -55,12 +55,11 @@ export default class Room {
 		});
 	}
 	startGame() {
-		/*
-		if (this.clients.size < 3) {
+		if (this.clients.length < 3) {
 			this.host.socket.disconnect();
 			logSocket(this.host.socket, 'Not enough users for startGame');
+			return;
 		}
-		*/
 		this.running = true;
 		console.log('game started '+this.name);
 	}
