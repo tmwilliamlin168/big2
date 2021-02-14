@@ -9,4 +9,10 @@ export default class Room {
 		this.name = name;
 		this.password = password;
 	}
+	add(client: Client) {
+		this.clients.push(client);
+		client.room = room;
+		client.socket.join(this.name);
+		server.to(this.name).emit('roomUpdate', {users: this.clients.map((client: Client) => client.username)});
+	}
 };

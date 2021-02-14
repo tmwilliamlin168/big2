@@ -108,11 +108,8 @@ server.on('connection', (socket: Socket) => {
 				return;
 			}
 			// Success
-			client.room = room;
-			room.clients.push(client);
-			client.socket.join(name);
 			socket.emit('joinRoomRes', {success: true});
-			server.to(name).emit('roomUpdate', {users: room.clients.map((client: Client) => client.username)});
+			room.add(client);
 		});
 
 		socket.on('createRoom', (name, password) => {
@@ -145,14 +142,11 @@ server.on('connection', (socket: Socket) => {
 				socket.emit('createRoomRes', {success: false, error: `Room "${name}" already exists`});
 				return;
 			}
+			// Success
+			socket.emit('createRoomRes', {success: true});
 			const room = new Room(name, password);
 			rooms.set(name, room);
-			// Success
-			client.room = room;
-			room.clients.push(client);
-			client.socket.join(name);
-			socket.emit('createRoomRes', {success: true});
-			server.to(name).emit('roomUpdate', {users: room.clients.map((client: Client) => client.username)});
+			room.add(client);
 		});
 	});
 
