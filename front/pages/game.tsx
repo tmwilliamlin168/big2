@@ -1,6 +1,9 @@
 import {useEffect, useState} from 'react';
 import io from 'socket.io-client';
 
+import CreateRoomForm from '../components/CreateRoomForm';
+import JoinRoomForm from '../components/JoinRoomForm';
+
 const LoginForm = ({finish, socket, username}: {finish: (s: string) => void, socket: SocketIOClient.Socket, username: string | null}) => {
 	const [value, setValue] = useState(username || '');
 	const [waiting, setWaiting] = useState(false);
@@ -47,6 +50,9 @@ export default function Game() {
 	const [loggedIn, setLoggedIn] = useState(false);
 	const [username, setUsername] = useState<string | null>(null);
 
+	const [room, setRoom] = useState<string | null>(null);
+	const [roomUsers, setRoomUsers] = useState([]);
+
 	useEffect(() => {
 		const socket = io(process.env.NEXT_PUBLIC_BACK_HOST!);
 		setSocket(socket);
@@ -54,7 +60,10 @@ export default function Game() {
 		socket.on('disconnect', () => {
 			setConnected(false);
 			setLoggedIn(false);
+			setRoom(null);
+			setRoomUsers([]);
 		});
+		socket.on('roomUpdate', data => setRoomUsers(data.users));
 		return () => {socket.close()};
 	}, []);
 
@@ -71,5 +80,30 @@ export default function Game() {
 			/>
 		);
 	}
-	return connected?'Connected':'Connecting';
+	if (!room) {
+		return (
+			<>
+				<p>Logged in as {username}</p>
+				<hr />
+				<JoinRoomForm
+					socket={socket}
+					finish={setRoom}
+				/>
+				<hr />
+				<CreateRoomForm
+					socket={socket}
+					finish={setRoom}
+				/>
+			</>
+		);
+	}
+	return (
+		<>
+			<p>Room {room}</p>
+			<p>Users:</p>
+			<ul>
+				{roomUsers.map(user => <li>{user}</li>)}
+			</ul>
+		</>
+	);
 }
