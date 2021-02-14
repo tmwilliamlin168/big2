@@ -143,9 +143,8 @@ server.on('connection', (socket: Socket) => {
 			}
 			// Success
 			socket.emit('createRoomRes', {success: true});
-			const room = new Room(name, password);
+			const room = new Room(name, password, client);
 			rooms.set(name, room);
-			room.add(client);
 		});
 	});
 

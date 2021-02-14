@@ -52,6 +52,7 @@ export default function Game() {
 
 	const [room, setRoom] = useState<string | null>(null);
 	const [roomUsers, setRoomUsers] = useState<string[]>([]);
+	const [roomHost, setRoomHost] = useState('');
 
 	useEffect(() => {
 		const socket = io(process.env.NEXT_PUBLIC_BACK_HOST!);
@@ -62,8 +63,12 @@ export default function Game() {
 			setLoggedIn(false);
 			setRoom(null);
 			setRoomUsers([]);
+			setRoomHost('');
 		});
-		socket.on('roomUpdate', (data: {users: string[]}) => setRoomUsers(data.users));
+		socket.on('roomUpdate', (data: {users: string[], host: string}) => {
+			setRoomUsers(data.users);
+			setRoomHost(data.host);
+		});
 		return () => {socket.close()};
 	}, []);
 
@@ -102,7 +107,7 @@ export default function Game() {
 			<p>Room {room}</p>
 			<p>Users:</p>
 			<ul>
-				{roomUsers.map(user => <li>{user}</li>)}
+				{roomUsers.map(user => <li>{user + (user === roomHost ? ' (Host)':'')}</li>)}
 			</ul>
 		</>
 	);
