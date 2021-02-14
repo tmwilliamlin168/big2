@@ -26,6 +26,7 @@ export default class Room {
 	addSocket(client: Client) {
 		client.socket.join(this.name);
 		client.socket.emit('joinRoom', {name: this.name});
+		client.socket.once('leaveRoom', () => this.remove(client));
 		server.to(this.name).emit('roomUpdate', {
 			users: this.clients.map((client: Client) => client.username),
 			host: this.host.username

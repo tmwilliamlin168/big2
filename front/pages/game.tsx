@@ -64,6 +64,7 @@ export default function Game() {
 			<ul>
 				{roomUsers.map(user => <li>{user + (user === roomHost ? ' (Host)':'')}</li>)}
 			</ul>
+			<button onClick={() => socket.emit('leaveRoom')}>Leave</button>
 		</>
 	);
 }
