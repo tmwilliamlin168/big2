@@ -1,4 +1,5 @@
 import Client from './Client';
+import server from './server';
 
 export default class Room {
 	name: string;
@@ -11,7 +12,7 @@ export default class Room {
 	}
 	add(client: Client) {
 		this.clients.push(client);
-		client.room = room;
+		client.room = this;
 		client.socket.join(this.name);
 		server.to(this.name).emit('roomUpdate', {users: this.clients.map((client: Client) => client.username)});
 	}

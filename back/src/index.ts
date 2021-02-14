@@ -1,16 +1,15 @@
 import dotenv from 'dotenv';
-import {Server, Socket} from 'socket.io';
+import {Socket} from 'socket.io';
 
 dotenv.config();
 
 import Client from './Client';
 import Room from './Room';
+import server from './server';
 
 const logSocket = (socket: Socket, s: string) => {
 	console.log(`[${socket.id}, ${socket.handshake.address}] ${s}`);
 };
-
-const server = new Server({cors: {origin: process.env.ORIGIN, methods: ['GET', 'POST']}});
 
 let newClientId = 0;
 const clients = new Map();
