@@ -108,7 +108,7 @@ server.on('connection', (socket: Socket) => {
 				return;
 			}
 			// Success
-			client.room = name;
+			client.room = room;
 			room.clients.push(client);
 			client.socket.join(name);
 			socket.emit('joinRoomRes', {success: true});
@@ -148,7 +148,7 @@ server.on('connection', (socket: Socket) => {
 			const room = new Room(name, password);
 			rooms.set(name, room);
 			// Success
-			client.room = name;
+			client.room = room;
 			room.clients.push(client);
 			client.socket.join(name);
 			socket.emit('createRoomRes', {success: true});
