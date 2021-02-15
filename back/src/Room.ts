@@ -24,9 +24,9 @@ export default class Room {
 	add(client: Client) {
 		this.clients.push(client);
 		client.room = this;
-		this.addSocket(client);
+		this.updateSocket(client);
 	}
-	addSocket(client: Client) {
+	updateSocket(client: Client) {
 		client.socket.join(this.name);
 		client.socket.emit('joinRoom', {name: this.name});
 		client.socket.once('leaveRoom', () => this.remove(client));
@@ -34,6 +34,8 @@ export default class Room {
 			users: this.clients.map((client: Client) => client.username),
 			host: this.host.username
 		});
+		if (this.game)
+			this.game.updateSocket(client);
 	}
 	remove(client: Client) {
 		this.clients.splice(this.clients.indexOf(client), 1);
@@ -54,6 +56,8 @@ export default class Room {
 			users: this.clients.map((client: Client) => client.username),
 			host: this.host.username
 		});
+		if (this.game)
+			this.game.remove(client);
 	}
 	startGame() {
 		if (this.clients.length < 3) {
@@ -61,7 +65,6 @@ export default class Room {
 			logSocket(this.host.socket, 'Not enough users for startGame');
 			return;
 		}
-		this.game = new Game();
-		console.log('game started '+this.name);
+		this.game = new Game(this);
 	}
 };

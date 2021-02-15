@@ -43,7 +43,7 @@ server.on('connection', (socket: Socket) => {
 			client.socket = socket;
 			socket.emit('loginRes', {success: true});
 			if (client.room)
-				client.room.addSocket(client);
+				client.room.updateSocket(client);
 			logSocket(socket, 'Reconnect login successful');
 		} else {
 			client = new Client(username, socket);
