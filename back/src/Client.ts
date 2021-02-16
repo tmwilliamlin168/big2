@@ -32,7 +32,7 @@ export default class Client {
 		this.onceListeners.get(e).push(f);
 		this.socket.once(e, (...args) => {
 			this.onceListeners.get(e).splice(this.onceListeners.get(e).indexOf(f), 1);
-			f(args);
+			f(...args);
 		});
 	}
 	removeAllListeners(e: string) {
@@ -47,7 +47,7 @@ export default class Client {
 		this.onceListeners.forEach((fs, e) => fs.forEach((f: (...args: any[]) => void) => {
 			socket.once(e, (...args) => {
 				this.onceListeners.get(e).splice(this.onceListeners.get(e).indexOf(f), 1);
-				f(args);
+				f(...args);
 			});
 		}));
 		if (this.room)
