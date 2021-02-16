@@ -120,6 +120,12 @@ export default function Game() {
 				>
 					Play
 				</button>
+				<button
+					onClick={() => socket.emit('turn', null)}
+					disabled={username !== gameState.playerTurn}
+				>
+					Pass
+				</button>
 			</div>
 		</>
 	);
