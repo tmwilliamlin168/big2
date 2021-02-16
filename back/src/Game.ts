@@ -148,6 +148,7 @@ export default class Game {
 				resolve();
 			});
 			p.disconnectListener = () => {
+				delete p.disconnectListener;
 				p.client.socket.removeAllListeners('turn');
 				resolve();
 			};
