@@ -98,6 +98,13 @@ export default function Game() {
 	const selectedCards = gameState.cards.filter((_, i) => cardSelected[i]);
 	return (
 		<>
+			<ul>
+				{gameState.players.map(p => (
+					<li key={p.username}>
+						{p.username + (p.rank ? ` (Rank ${p.rank})` : '') + (p.numCards ? ` (${p.numCards} cards)` : '')}
+					</li>
+				))}
+			</ul>
 			<div>
 				<p>Your cards:</p>
 				{gameState.cards.map((card, i) => (
