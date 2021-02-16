@@ -5,20 +5,21 @@
   "main": "index.js",
   "scripts": {
     "start": "node dist/index.js",
-    "postinstall": "tsc",
+    "build": "tsc",
     "dev": "nodemon",
     "dev2": "tsc && npm start"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@types/node": "^14.14.27",
-    "@types/socket.io": "^2.1.13",
+    "big2-core": "file:../core",
     "dotenv": "^8.2.0",
-    "socket.io": "^3.1.1",
-    "typescript": "^4.1.5"
+    "socket.io": "^3.1.1"
   },
   "devDependencies": {
-    "nodemon": "^2.0.7"
+    "@types/node": "^14.14.28",
+    "@types/socket.io": "^2.1.13",
+    "nodemon": "^2.0.7",
+    "typescript": "^4.1.5"
   }
 }
