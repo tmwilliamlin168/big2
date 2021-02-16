@@ -17,13 +17,13 @@ class Player {
 		this.game = game;
 		this.client = client;
 	}
-	sendGameStatus() {
+	sendGameState() {
 		this.cards.sort(cmpCard);
 		const i = this.game.players.indexOf(this);
 		const otherPlayers = [];
 		for (let j = 1; j < this.game.players.length; ++j)
 			otherPlayers.push(this.game.players[(i + j) % this.game.players.length]);
-		this.client.socket.emit('gameStatus', {
+		this.client.socket.emit('gameState', {
 			cards: this.cards,
 			rank: this.rank,
 			passed: this.passed,
@@ -83,14 +83,14 @@ export default class Game {
 			}
 			await this.round();
 		}
-		this.broadcastGameStatus();
+		this.broadcastGameState();
 		setTimeout(() => {
 			server.to(this.room.name).emit('endGame');
 			this.room.game = null;
 		}, 5000);
 	}
-	broadcastGameStatus() {
-		this.players.forEach((p: Player) => p.sendGameStatus());
+	broadcastGameState() {
+		this.players.forEach((p: Player) => p.sendGameState());
 	}
 	async round() {
 		while (true) {
@@ -115,7 +115,7 @@ export default class Game {
 	async turn() {
 		const p = this.players[this.playerTurn];
 		if (p.passed) return;
-		this.broadcastGameStatus();
+		this.broadcastGameState();
 		await new Promise<void>(resolve => {
 			p.client.socket.once('turn', cards => {
 				delete p.disconnectListener;
@@ -155,7 +155,7 @@ export default class Game {
 	}
 	updateSocket(client: Client) {
 		client.socket.emit('startGame');
-		this.players.find((p: Player) => p.client === client)!.sendGameStatus();
+		this.players.find((p: Player) => p.client === client)!.sendGameState();
 	}
 	remove(client: Client) {
 		const p = this.players.find((p: Player) => p.client === client)!;
