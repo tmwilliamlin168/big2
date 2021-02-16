@@ -55,7 +55,7 @@ export default class Game {
 	async start() {
 		const cards = [];
 		for (let i = 1; i <= 13; ++i)
-			for (let j = 1; j <= 4; ++j)
+			for (let j = 0; j < 4; ++j)
 				cards.push({rank: i, suit: j});
 		for (let i = 0; i < 52; ++i) {
 			const j = Math.floor(Math.random() * (i+1));
@@ -66,7 +66,9 @@ export default class Game {
 			this.players.push(new Player(this, this.room.clients[i]));
 			this.players[i].cards = cards.slice(i * handSize, (i + 1) * handSize);
 		}
-		const startingPlayer = (this.players.find((p: Player) => p.cards.includes({rank: 3, suit: Suit.Clubs})) || this.players[0]);
+		const startingPlayer = this.players.find((p: Player) => p.cards.some(
+			(card: Card) => card.rank === 3 && card.suit === Suit.Clubs
+		)) || this.players[0];
 		if (this.room.clients.length === 3)
 			 startingPlayer.cards.push(cards[51]);
 		this.playerTurn = this.players.indexOf(startingPlayer);
