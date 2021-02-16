@@ -67,5 +67,5 @@ export default function canPlay(prev: Card[] | null, cur: Card[]) {
 	const prevHand = parseHand(prev)!;
 	if (!hands[curHand.id].overrideSize && cur.length !== prev.length) return false;
 	if (curHand.id !== prevHand.id) return curHand.id < prevHand.id;
-	return cmpCard(prevHand.card, curHand.card);
+	return cmpCard(prevHand.card, curHand.card) < 0;
 };
