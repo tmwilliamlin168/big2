@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "tsc": "tsc"
+    "tsc": "tsc",
+		"preinstall": "cd ../core && npm i && npm run build"
   },
   "dependencies": {
     "big2-core": "file:../core",
