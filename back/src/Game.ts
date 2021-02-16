@@ -34,7 +34,7 @@ class Player {
 				passed: p.passed
 			})),
 			lastPlayed: this.game.lastPlayed,
-			lastPlayedPlayer: this.game.lastPlayedPlayer,
+			lastPlayedPlayer: this.game.lastPlayedPlayer < 0 ? null : this.game.players[this.game.lastPlayedPlayer].client.username,
 			playerTurn: this.game.players[this.game.playerTurn].client.username
 		});
 	}
