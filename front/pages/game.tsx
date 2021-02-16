@@ -107,7 +107,12 @@ export default function Game() {
 			</ul>
 			<div>
 				<p>Last played:</p>
-				{gameState.lastPlayed ? gameState.lastPlayed.map((card, i) => <span key={i}>{card.rank+' '+card.suit}</span>) : '(Nothing)'}
+				{gameState.lastPlayed ? (
+					<>
+						{gameState.lastPlayed.map((card, i) => <span key={i}>{card.rank+' '+card.suit}</span>)}
+						{` by ${gameState.lastPlayedPlayer}`}
+					</>
+				) : '(Nothing)'}
 			</div>
 			<div>
 				<p>Your cards:</p>
