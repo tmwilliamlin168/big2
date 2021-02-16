@@ -18,23 +18,26 @@ export default class Room {
 		this.password = password;
 		this.host = host;
 		this.add(host);
+		host.once('startGame', () => this.startGame());
 		Room.rooms.set(name, this);
 	}
 	add(client: Client) {
 		this.clients.push(client);
 		client.room = this;
+		server.to(this.name).emit('roomUpdate', {
+			users: this.clients.map((client: Client) => client.username),
+			host: this.host.username
+		});
+		client.once('leaveRoom', () => this.remove(client));
 		this.updateSocket(client);
 	}
 	updateSocket(client: Client) {
 		client.socket.join(this.name);
 		client.socket.emit('joinRoom', {name: this.name});
-		client.socket.once('leaveRoom', () => this.remove(client));
-		server.to(this.name).emit('roomUpdate', {
+		client.socket.emit('roomUpdate', {
 			users: this.clients.map((client: Client) => client.username),
 			host: this.host.username
 		});
-		if (this.host === client)
-			this.host.socket.once('startGame', () => this.startGame());
 		if (this.game)
 			this.game.updateSocket(client);
 	}
@@ -48,10 +51,10 @@ export default class Room {
 			return;
 		}
 		if (this.host === client) {
-			this.host.socket.removeAllListeners('startGame');
+			this.host.removeAllListeners('startGame');
 			this.host = this.clients[0];
 			if (!this.game)
-				this.host.socket.once('startGame', () => this.startGame());
+				this.host.once('startGame', () => this.startGame());
 		}
 		server.to(this.name).emit('roomUpdate', {
 			users: this.clients.map((client: Client) => client.username),

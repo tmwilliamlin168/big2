@@ -48,7 +48,6 @@ export default class Game {
 	playerTurn = 0;
 	playersFinished = 0;
 	constructor(room: Room) {
-		console.log('Game started');
 		this.room = room;
 		this.start();
 	}
@@ -93,7 +92,6 @@ export default class Game {
 		}, 5000);
 	}
 	broadcastGameState() {
-		console.log('broadcast');
 		this.players.forEach((p: Player) => p.sendGameState());
 	}
 	async round() {
@@ -123,7 +121,7 @@ export default class Game {
 		if (p.passed) return;
 		this.broadcastGameState();
 		await new Promise<void>(resolve => {
-			p.client.socket.once('turn', cards => {
+			p.client.once('turn', cards => {
 				delete p.disconnectListener;
 				(() => {
 					// Pass
@@ -132,7 +130,6 @@ export default class Game {
 						return;
 					}
 					// Play
-					console.log('got cards', cards);
 					if (cards && Array.isArray(cards) && cards.every((a: Card) => a && p.cards.some((b: Card) => !cmpCard(a, b))) && canPlay(this.lastPlayed, cards)) {
 						// Cards have to be ascending
 						let ok = true;
@@ -156,7 +153,7 @@ export default class Game {
 			});
 			p.disconnectListener = () => {
 				delete p.disconnectListener;
-				p.client.socket.removeAllListeners('turn');
+				p.client.removeAllListeners('turn');
 				resolve();
 			};
 		});

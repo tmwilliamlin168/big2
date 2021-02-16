@@ -40,10 +40,11 @@ server.on('connection', (socket: Socket) => {
 			}
 			client = client2;
 			clearTimeout(client.disconnectTimeout!);
-			client.socket = socket;
+			// client.socket = socket;
+			client.updateSocket(socket);
 			socket.emit('loginRes', {success: true});
-			if (client.room)
-				client.room.updateSocket(client);
+			// if (client.room)
+				// client.room.updateSocket(client);
 			logSocket(socket, 'Reconnect login successful');
 		} else {
 			client = new Client(username, socket);
@@ -51,93 +52,93 @@ server.on('connection', (socket: Socket) => {
 			usernameToId.set(username, client.id);
 			socket.emit('loginRes', {success: true});
 			logSocket(socket, 'Login successful');
+
+			client.on('joinRoom', (name, password) => {
+				client = client as Client;
+				// Bad name argument
+				if (typeof name !== 'string' || name.length < 1 || name.length > 15) {
+					socket.disconnect();
+					logSocket(socket, 'Bad name argument on joinRoom');
+					return;
+				}
+				// Bad password argument
+				if (typeof password !== 'string' || password.length > 15) {
+					socket.disconnect();
+					logSocket(socket, 'Bad password argument on joinRoom');
+					return;
+				}
+				// Character filter
+				if (!name.match(/^[0-9a-zA-Z ]+$/)) {
+					socket.emit('joinRoomRes', {success: false, error: 'Room name can only consist of alphanumeric characters and spaces'});
+					return;
+				}
+				// Make sure not in room
+				if (client.room) {
+					socket.disconnect();
+					logSocket(socket, 'Already in room on joinRoom');
+					return;
+				}
+				// Make sure room exists
+				if (!Room.get(name)) {
+					socket.emit('joinRoomRes', {success: false, error: `Room "${name}" does not exist`});
+					return;
+				}
+				const room = Room.get(name);
+				// Make sure password is correct
+				if (password !== room.password) {
+					socket.emit('joinRoomRes', {success: false, error: 'Password is incorrect'});
+					return;
+				}
+				// Make sure game has not yet started
+				if (room.game) {
+					socket.emit('joinRoomRes', {success: false, error: 'The game has already started'});
+					return;
+				}
+				// Make sure room has space
+				if (room.clients.length > 3) {
+					socket.emit('joinRoomRes', {success: false, error: 'Room does not have enough space'});
+					return;
+				}
+				// Success
+				socket.emit('joinRoomRes', {success: true});
+				room.add(client);
+			});
+
+			client.on('createRoom', (name, password) => {
+				client = client as Client;
+				// Bad name argument
+				if (typeof name !== 'string' || name.length < 1 || name.length > 15) {
+					socket.disconnect();
+					logSocket(socket, 'Bad name argument on createRoom');
+					return;
+				}
+				// Bad password argument
+				if (typeof password !== 'string' || password.length > 15) {
+					socket.disconnect();
+					logSocket(socket, 'Bad password argument on createRoom');
+					return;
+				}
+				// Character filter
+				if (!name.match(/^[0-9a-zA-Z ]+$/)) {
+					socket.emit('createRoomRes', {success: false, error: 'Room name can only consist of alphanumeric characters and spaces'});
+					return;
+				}
+				// Make sure not in room
+				if (client.room) {
+					socket.disconnect();
+					logSocket(socket, 'Already in room on createRoom');
+					return;
+				}
+				// Make sure room does not exist
+				if (Room.get(name)) {
+					socket.emit('createRoomRes', {success: false, error: `Room "${name}" already exists`});
+					return;
+				}
+				// Success
+				socket.emit('createRoomRes', {success: true});
+				new Room(name, password, client);
+			});
 		}
-
-		socket.on('joinRoom', (name, password) => {
-			client = client as Client;
-			// Bad name argument
-			if (typeof name !== 'string' || name.length < 1 || name.length > 15) {
-				socket.disconnect();
-				logSocket(socket, 'Bad name argument on joinRoom');
-				return;
-			}
-			// Bad password argument
-			if (typeof password !== 'string' || password.length > 15) {
-				socket.disconnect();
-				logSocket(socket, 'Bad password argument on joinRoom');
-				return;
-			}
-			// Character filter
-			if (!name.match(/^[0-9a-zA-Z ]+$/)) {
-				socket.emit('joinRoomRes', {success: false, error: 'Room name can only consist of alphanumeric characters and spaces'});
-				return;
-			}
-			// Make sure not in room
-			if (client.room) {
-				socket.disconnect();
-				logSocket(socket, 'Already in room on joinRoom');
-				return;
-			}
-			// Make sure room exists
-			if (!Room.get(name)) {
-				socket.emit('joinRoomRes', {success: false, error: `Room "${name}" does not exist`});
-				return;
-			}
-			const room = Room.get(name);
-			// Make sure password is correct
-			if (password !== room.password) {
-				socket.emit('joinRoomRes', {success: false, error: 'Password is incorrect'});
-				return;
-			}
-			// Make sure game has not yet started
-			if (room.game) {
-				socket.emit('joinRoomRes', {success: false, error: 'The game has already started'});
-				return;
-			}
-			// Make sure room has space
-			if (room.clients.length > 3) {
-				socket.emit('joinRoomRes', {success: false, error: 'Room does not have enough space'});
-				return;
-			}
-			// Success
-			socket.emit('joinRoomRes', {success: true});
-			room.add(client);
-		});
-
-		socket.on('createRoom', (name, password) => {
-			client = client as Client;
-			// Bad name argument
-			if (typeof name !== 'string' || name.length < 1 || name.length > 15) {
-				socket.disconnect();
-				logSocket(socket, 'Bad name argument on createRoom');
-				return;
-			}
-			// Bad password argument
-			if (typeof password !== 'string' || password.length > 15) {
-				socket.disconnect();
-				logSocket(socket, 'Bad password argument on createRoom');
-				return;
-			}
-			// Character filter
-			if (!name.match(/^[0-9a-zA-Z ]+$/)) {
-				socket.emit('createRoomRes', {success: false, error: 'Room name can only consist of alphanumeric characters and spaces'});
-				return;
-			}
-			// Make sure not in room
-			if (client.room) {
-				socket.disconnect();
-				logSocket(socket, 'Already in room on createRoom');
-				return;
-			}
-			// Make sure room does not exist
-			if (Room.get(name)) {
-				socket.emit('createRoomRes', {success: false, error: `Room "${name}" already exists`});
-				return;
-			}
-			// Success
-			socket.emit('createRoomRes', {success: true});
-			new Room(name, password, client);
-		});
 	});
 
 	socket.on('disconnect', () => {
