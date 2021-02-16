@@ -19,7 +19,6 @@ export default class Room {
 		this.host = host;
 		this.add(host);
 		Room.rooms.set(name, this);
-		host.socket.once('startGame', () => this.startGame());
 	}
 	add(client: Client) {
 		this.clients.push(client);
@@ -34,6 +33,8 @@ export default class Room {
 			users: this.clients.map((client: Client) => client.username),
 			host: this.host.username
 		});
+		if (this.host === client)
+			this.host.socket.once('startGame', () => this.startGame());
 		if (this.game)
 			this.game.updateSocket(client);
 	}
