@@ -1,4 +1,3 @@
-import {Card, Suit} from 'big2-core';
 import {useEffect, useState} from 'react';
 import io from 'socket.io-client';
 
@@ -16,8 +15,10 @@ export default function Game() {
 	const [roomUsers, setRoomUsers] = useState<string[]>([]);
 	const [roomHost, setRoomHost] = useState('');
 
+	const [gameState, setGameState] = useState(null);
+	const [cardSelected, setCardSelected] = useState([]);
+
 	useEffect(() => {
-		console.log(new Card(3, Suit.Clubs));
 		const socket = io(process.env.NEXT_PUBLIC_BACK_HOST!);
 		setSocket(socket);
 		socket.on('connect', () => setConnected(true));
@@ -26,12 +27,21 @@ export default function Game() {
 			setLoggedIn(false);
 			setRoom(null);
 		});
+
 		socket.on('joinRoom', (data: {name: string}) => setRoom(data.name));
 		socket.on('leaveRoom', () => setRoom(null));
 		socket.on('roomUpdate', (data: {users: string[], host: string}) => {
 			setRoomUsers(data.users);
 			setRoomHost(data.host);
 		});
+
+		socket.on('gameState', (data) => {
+			setGameState(data);
+			if (data.cards.length !== cardSelected.length)
+				setCardSelected(new Array(data.cards.length).fill(false));
+		});
+		socket.on('endGame', () => setGameStatus(null));
+
 		return () => {socket.close()};
 	}, []);
 
@@ -59,22 +69,45 @@ export default function Game() {
 			</>
 		);
 	}
+	if (!gameState) {
+		return (
+			<>
+				<p>Room {room}</p>
+				<p>Users:</p>
+				<ul>
+					{roomUsers.map(user => <li key={user}>{user + (user === roomHost ? ' (Host)':'')}</li>)}
+				</ul>
+				<button onClick={() => socket.emit('leaveRoom')}>Leave</button>
+				{username === roomHost &&
+					<button
+						onClick={() => socket.emit('startGame')}
+						disabled={roomUsers.length < 3}
+					>
+						Start
+					</button>
+				}
+			</>
+		);
+	}
 	return (
 		<>
-			<p>Room {room}</p>
-			<p>Users:</p>
-			<ul>
-				{roomUsers.map(user => <li key={user}>{user + (user === roomHost ? ' (Host)':'')}</li>)}
-			</ul>
-			<button onClick={() => socket.emit('leaveRoom')}>Leave</button>
-			{username === roomHost &&
-				<button
-					onClick={() => socket.emit('startGame')}
-					disabled={roomUsers.length < 3}
-				>
-					Start
-				</button>
-			}
+			<div>
+				<p>Your cards:</p>
+				{gameState.cards.map((card, i) => (
+					<label key={card}>
+						<input
+							type="checkbox"
+							defaultChecked={cardSelected[i]}
+							onChange={() => {
+								const cardSelected2 = [...cardSelected];
+								cardSelected2[i] = !cardSelected[i];
+								setCardSelected(cardSelected2);
+							}}
+						/>
+						{card.rank+' '+card.suit}
+					</label>
+				))}
+			</div>
 		</>
 	);
 }
