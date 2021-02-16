@@ -7,8 +7,8 @@
     "start": "node dist/index.js",
     "build": "tsc",
     "dev": "nodemon",
-    "dev2": "tsc && npm start",
-		"preinstall": "cd ../core && npm i && npm run build"
+    "dev2": "npm run build && npm start",
+    "preinstall": "cd ../core && npm i && npm run build"
   },
   "author": "",
   "license": "ISC",
