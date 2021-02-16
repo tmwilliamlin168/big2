@@ -10,6 +10,7 @@ class Player {
 	client: Client;
 	cards: Card[] = [];
 	disconnected = false;
+	disconnectListener?: () => void;
 	rank = 0;
 	passed = false;
 	constructor(game: Game, client: Client) {
@@ -27,13 +28,14 @@ class Player {
 			rank: this.rank,
 			passed: this.passed,
 			players: otherPlayers.map((p: Player) => ({
+				username: p.client.username,
 				numCards: p.cards.length,
 				rank: p.rank,
 				passed: p.passed
 			})),
 			lastPlayed: this.game.lastPlayed,
 			lastPlayedPlayer: this.game.lastPlayedPlayer,
-			playerTurn: this.game.playerTurn
+			playerTurn: this.game.players[this.game.playerTurn].client.username
 		});
 	}
 }
@@ -92,19 +94,32 @@ export default class Game {
 		this.players.forEach((p: Player) => p.sendGameStatus());
 	}
 	async round() {
-
+		while (true) {
+			// Everyone passes
+			if (this.playerTurn === this.lastPlayedPlayer) break;
+			const p = this.players[this.playerTurn];
+			// Guy passes
+			if (p.rank || p.disconnected || p.passed) {
+				this.playerTurn = (this.playerTurn + 1) % this.players.length;
+				continue;
+			}
+			await this.turn();
+			this.playerTurn = (this.playerTurn + 1) % this.players.length;
+			// Check if person ends
+			if (p.rank)
+				break;
+		}
+		this.lastPlayed = null;
+		this.lastPlayedPlayer = -1;
+		this.players.forEach((p: Player) => p.passed = false);
 	}
 	async turn() {
 		const p = this.players[this.playerTurn];
 		if (p.passed) return;
 		this.broadcastGameStatus();
 		await new Promise<void>(resolve => {
-			const onLeaveRoom = () => {
-				p.client.socket.removeAllListeners('turn');
-				resolve();
-			};
 			p.client.socket.once('turn', cards => {
-				p.client.socket.off('leaveRoom', onLeaveRoom);
+				delete p.disconnectListener;
 				(() => {
 					// Pass
 					if (cards === null) {
@@ -112,17 +127,31 @@ export default class Game {
 						return;
 					}
 					// Play
-					if (cards && cards.isArray() && cards.every((card: Card) => card && card instanceof Card) && canPlay(this.lastPlayed, cards)) {
-						this.lastPlayed = cards;
-						this.lastPlayedPlayer = this.playerTurn;
-						return;
+					if (cards && cards.isArray() && cards.every((card: Card) => p.cards.includes(card)) && canPlay(this.lastPlayed, cards)) {
+						// Cards have to be ascending
+						let ok = true;
+						for (let i = 0; i + 1 < cards.length; ++i)
+							ok = ok && cmpCard(cards[i], cards[i + 1]) < 0;
+						if (ok) {
+							// Remove cards
+							p.cards = p.cards.filter((card: Card) => cards.indexOf(card) < 0);
+							// Check if won
+							if (!p.cards.length)
+								p.rank = ++this.playersFinished;
+							this.lastPlayed = cards;
+							this.lastPlayedPlayer = this.playerTurn;
+							return;
+						}
 					}
 					p.client.socket.disconnect();
 					logSocket(p.client.socket, 'Bad cards argument on turn');
 				})();
 				resolve();
 			});
-			p.client.socket.once('leaveRoom', onLeaveRoom);
+			p.disconnectListener = () => {
+				p.client.socket.removeAllListeners('turn');
+				resolve();
+			};
 		});
 	}
 	updateSocket(client: Client) {
@@ -130,6 +159,9 @@ export default class Game {
 		this.players.find((p: Player) => p.client === client)!.sendGameStatus();
 	}
 	remove(client: Client) {
-		this.players.find((p: Player) => p.client === client)!.disconnected = true;
+		const p = this.players.find((p: Player) => p.client === client)!;
+		p.disconnected = true;
+		if (p.disconnectListener)
+			p.disconnectListener();
 	}
 };
