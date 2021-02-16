@@ -162,7 +162,6 @@ export default class Game {
 		});
 	}
 	updateSocket(client: Client) {
-		client.socket.emit('startGame');
 		this.players.find((p: Player) => p.client === client)!.sendGameState();
 	}
 	remove(client: Client) {
