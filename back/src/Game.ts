@@ -88,6 +88,7 @@ export default class Game {
 		this.broadcastGameState();
 		setTimeout(() => {
 			server.to(this.room.name).emit('endGame');
+			this.room.host.once('startGame', () => this.room.startGame());
 			this.room.game = null;
 		}, 5000);
 	}
