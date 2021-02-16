@@ -48,6 +48,7 @@ export default class Game {
 	playerTurn = 0;
 	playersFinished = 0;
 	constructor(room: Room) {
+		console.log('Game started');
 		this.room = room;
 		this.start();
 	}
@@ -55,7 +56,7 @@ export default class Game {
 		const cards = [];
 		for (let i = 1; i <= 13; ++i)
 			for (let j = 1; j <= 4; ++j)
-				cards.push(new Card(i, j));
+				cards.push({rank: i, suit: j});
 		for (let i = 0; i < 52; ++i) {
 			const j = Math.floor(Math.random() * (i+1));
 			[cards[i], cards[j]] = [cards[j], cards[i]];
@@ -65,7 +66,7 @@ export default class Game {
 			this.players.push(new Player(this, this.room.clients[i]));
 			this.players[i].cards = cards.slice(i * handSize, (i + 1) * handSize);
 		}
-		const startingPlayer = (this.players.find((p: Player) => p.cards.includes(new Card(3, Suit.Clubs))) || this.players[0]);
+		const startingPlayer = (this.players.find((p: Player) => p.cards.includes({rank: 3, suit: Suit.Clubs})) || this.players[0]);
 		if (this.room.clients.length === 3)
 			 startingPlayer.cards.push(cards[51]);
 		this.playerTurn = this.players.indexOf(startingPlayer);
@@ -93,6 +94,7 @@ export default class Game {
 		this.players.forEach((p: Player) => p.sendGameState());
 	}
 	async round() {
+		console.log('start round');
 		while (true) {
 			// Everyone passes
 			if (this.playerTurn === this.lastPlayedPlayer) break;
@@ -113,6 +115,7 @@ export default class Game {
 		this.players.forEach((p: Player) => p.passed = false);
 	}
 	async turn() {
+		console.log('start turn', this.playerTurn);
 		const p = this.players[this.playerTurn];
 		if (p.passed) return;
 		this.broadcastGameState();
@@ -126,6 +129,7 @@ export default class Game {
 						return;
 					}
 					// Play
+					console.log('got cards', cards);
 					if (cards && cards.isArray() && cards.every((card: Card) => p.cards.includes(card)) && canPlay(this.lastPlayed, cards)) {
 						// Cards have to be ascending
 						let ok = true;
