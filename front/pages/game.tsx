@@ -114,6 +114,7 @@ export default function Game() {
 					</>
 				) : '(Nothing)'}
 			</div>
+			{`It's ${gameState.playerTurn}'s turn!`}
 			<div>
 				<p>Your cards:</p>
 				{gameState.cards.map((card, i) => (
