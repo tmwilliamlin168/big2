@@ -1,7 +1,10 @@
-/front/node_modules
-/front/.next
-/front/.env
+core/node_modules
+core/dist
 
-/back/node_modules
-/back/dist
-/back/.env
+front/node_modules
+front/.next
+front/.env
+
+back/node_modules
+back/dist
+back/.env
