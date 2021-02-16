@@ -1,10 +1,18 @@
-import {canPlay} from 'big2-core';
+import {canPlay, Card} from 'big2-core';
 import {useEffect, useState} from 'react';
 import io from 'socket.io-client';
 
 import CreateRoomForm from '../components/CreateRoomForm';
 import JoinRoomForm from '../components/JoinRoomForm';
 import LoginForm from '../components/LoginForm';
+
+interface GameState {
+	cards: Card[],
+	players: {username: string, numCards: number, rank: number}[],
+	lastPlayed: Card[] | null,
+	lastPlayedPlayer: string | null,
+	playerTurn: string
+}
 
 export default function Game() {
 	const [socket, setSocket] = useState<SocketIOClient.Socket | null>(null);
@@ -16,8 +24,8 @@ export default function Game() {
 	const [roomUsers, setRoomUsers] = useState<string[]>([]);
 	const [roomHost, setRoomHost] = useState('');
 
-	const [gameState, setGameState] = useState(null);
-	const [cardSelected, setCardSelected] = useState([]);
+	const [gameState, setGameState] = useState<GameState | null>(null);
+	const [cardSelected, setCardSelected] = useState<boolean[]>([]);
 
 	useEffect(() => {
 		const socket = io(process.env.NEXT_PUBLIC_BACK_HOST!);
@@ -40,8 +48,7 @@ export default function Game() {
 			setRoomHost(data.host);
 		});
 
-		socket.on('gameState', (data) => {
-			console.log(data);
+		socket.on('gameState', (data: GameState) => {
 			setGameState(data);
 			if (data.cards.length !== cardSelected.length)
 				setCardSelected(new Array(data.cards.length).fill(false));
