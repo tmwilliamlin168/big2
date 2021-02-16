@@ -1,5 +1,6 @@
 import Card from './Card';
 import cmpCard from './cmpCard';
+import realRank from './realRank';
 
 class Hand {
 	size: number;
@@ -19,7 +20,7 @@ const chkFlush = (cards: Card[]) => cards.every((card: Card) => card.suit === ca
 const chkStraight = (cards: Card[]) => {
 	let ok = true;
 	for (let i = 1; i < 5; ++i)
-		ok = ok && cards[0].realRank() + i === cards[i].realRank();
+		ok = ok && realRank(cards[0]) + i === realRank(cards[i]);
 	if (ok) return true;
 	// 3 4 5 6 2
 	ok = cards[4].rank === 2;
