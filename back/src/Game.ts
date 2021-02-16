@@ -93,6 +93,7 @@ export default class Game {
 		}, 5000);
 	}
 	broadcastGameState() {
+		console.log('broadcast');
 		this.players.forEach((p: Player) => p.sendGameState());
 	}
 	async round() {
@@ -132,14 +133,14 @@ export default class Game {
 					}
 					// Play
 					console.log('got cards', cards);
-					if (cards && cards.isArray() && cards.every((card: Card) => p.cards.includes(card)) && canPlay(this.lastPlayed, cards)) {
+					if (cards && Array.isArray(cards) && cards.every((a: Card) => a && p.cards.some((b: Card) => !cmpCard(a, b))) && canPlay(this.lastPlayed, cards)) {
 						// Cards have to be ascending
 						let ok = true;
 						for (let i = 0; i + 1 < cards.length; ++i)
 							ok = ok && cmpCard(cards[i], cards[i + 1]) < 0;
 						if (ok) {
 							// Remove cards
-							p.cards = p.cards.filter((card: Card) => cards.indexOf(card) < 0);
+							p.cards = p.cards.filter((a: Card) => !cards.some((b: Card) => !cmpCard(a, b)));
 							// Check if won
 							if (!p.cards.length)
 								p.rank = ++this.playersFinished;
