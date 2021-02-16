@@ -1,3 +1,4 @@
+import {canPlay} from 'big2-core';
 import {useEffect, useState} from 'react';
 import io from 'socket.io-client';
 
@@ -26,16 +27,21 @@ export default function Game() {
 			setConnected(false);
 			setLoggedIn(false);
 			setRoom(null);
+			setGameState(null);
 		});
 
 		socket.on('joinRoom', (data: {name: string}) => setRoom(data.name));
-		socket.on('leaveRoom', () => setRoom(null));
+		socket.on('leaveRoom', () => {
+			setRoom(null);
+			setGameState(null);
+		});
 		socket.on('roomUpdate', (data: {users: string[], host: string}) => {
 			setRoomUsers(data.users);
 			setRoomHost(data.host);
 		});
 
 		socket.on('gameState', (data) => {
+			console.log(data);
 			setGameState(data);
 			if (data.cards.length !== cardSelected.length)
 				setCardSelected(new Array(data.cards.length).fill(false));
@@ -89,12 +95,13 @@ export default function Game() {
 			</>
 		);
 	}
+	const selectedCards = gameState.cards.filter((_, i) => cardSelected[i]);
 	return (
 		<>
 			<div>
 				<p>Your cards:</p>
 				{gameState.cards.map((card, i) => (
-					<label key={card}>
+					<label key={card.rank+' '+card.suit}>
 						<input
 							type="checkbox"
 							defaultChecked={cardSelected[i]}
@@ -107,6 +114,12 @@ export default function Game() {
 						{card.rank+' '+card.suit}
 					</label>
 				))}
+				<button
+					onClick={() => socket.emit('turn', selectedCards)}
+					disabled={username !== gameState.playerTurn || !canPlay(gameState.lastPlayed, selectedCards)}
+				>
+					Play
+				</button>
 			</div>
 		</>
 	);
