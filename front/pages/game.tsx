@@ -104,7 +104,7 @@ export default function Game() {
 					<label key={card.rank+' '+card.suit}>
 						<input
 							type="checkbox"
-							checked={cardSelected[i]}
+							checked={cardSelected[i] || false}
 							onChange={() => {
 								const cardSelected2 = [...cardSelected];
 								cardSelected2[i] = !cardSelected[i];
