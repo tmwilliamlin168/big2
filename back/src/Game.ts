@@ -96,7 +96,6 @@ export default class Game {
 		this.players.forEach((p: Player) => p.sendGameState());
 	}
 	async round() {
-		console.log('start round');
 		while (true) {
 			// Everyone passes
 			if (this.playerTurn === this.lastPlayedPlayer) break;
@@ -117,7 +116,6 @@ export default class Game {
 		this.players.forEach((p: Player) => p.passed = false);
 	}
 	async turn() {
-		console.log('start turn', this.playerTurn);
 		const p = this.players[this.playerTurn];
 		if (p.passed) return;
 		this.broadcastGameState();
