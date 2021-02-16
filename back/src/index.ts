@@ -153,4 +153,4 @@ server.on('connection', (socket: Socket) => {
 	});
 });
 
-server.listen(+process.env.PORT! || 6900);
+server.listen(+process.env.PORT!);
