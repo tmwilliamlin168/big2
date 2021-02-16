@@ -9,6 +9,7 @@
     "tsc": "tsc"
   },
   "dependencies": {
+    "big2-core": "file:../core",
     "next": "10.0.6",
     "react": "17.0.1",
     "react-dom": "17.0.1",

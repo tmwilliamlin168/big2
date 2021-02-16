@@ -1,3 +1,4 @@
+import {Card, Suit} from 'big2-core';
 import {useEffect, useState} from 'react';
 import io from 'socket.io-client';
 
@@ -16,6 +17,7 @@ export default function Game() {
 	const [roomHost, setRoomHost] = useState('');
 
 	useEffect(() => {
+		console.log(new Card(3, Suit.Clubs));
 		const socket = io(process.env.NEXT_PUBLIC_BACK_HOST!);
 		setSocket(socket);
 		socket.on('connect', () => setConnected(true));
