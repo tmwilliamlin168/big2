@@ -46,7 +46,7 @@ export default function Game() {
 			if (data.cards.length !== cardSelected.length)
 				setCardSelected(new Array(data.cards.length).fill(false));
 		});
-		socket.on('endGame', () => setGameStatus(null));
+		socket.on('endGame', () => setGameState(null));
 
 		return () => {socket.close()};
 	}, []);
