@@ -69,7 +69,6 @@ export default class Game {
 		if (this.room.clients.length === 3)
 			 startingPlayer.cards.push(cards[51]);
 		this.playerTurn = this.players.indexOf(startingPlayer);
-		this.players.forEach((p: Player) => p.client.socket.emit('startGame'));
 		while (true) {
 			// Check if game ended
 			const playersLeft: Player[] = [];
