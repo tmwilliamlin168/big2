@@ -153,5 +153,3 @@ server.on('connection', (socket: Socket) => {
 		}, 60000);
 	});
 });
-
-server.listen(+process.env.PORT!);
