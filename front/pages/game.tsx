@@ -14,6 +14,7 @@ interface GameState {
 	playerTurn: string
 }
 
+const rankStrs = ['', 'A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
 const suitChars = ['♣', '♦', '♥', '♠'];
 
 export default function Game() {
@@ -118,7 +119,7 @@ export default function Game() {
 				<p>Last played:</p>
 				{gameState.lastPlayed ? (
 					<>
-						{gameState.lastPlayed.map((card, i) => <span key={i}>{card.rank+' '+suitChars[card.suit]+'|'}</span>)}
+						{gameState.lastPlayed.map((card, i) => <span key={i}>{rankStrs[card.rank]+' '+suitChars[card.suit]+'|'}</span>)}
 						{` by ${gameState.lastPlayedPlayer}`}
 					</>
 				) : '(Nothing)'}
@@ -137,7 +138,7 @@ export default function Game() {
 								setCardSelected(cardSelected2);
 							}}
 						/>
-						{card.rank+' '+suitChars[card.suit]}
+						{rankStrs[card.rank]+' '+suitChars[card.suit]}
 					</label>
 				))}
 				<button
