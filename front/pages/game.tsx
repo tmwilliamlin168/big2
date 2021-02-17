@@ -127,7 +127,7 @@ export default function Game() {
 			<div>
 				<p>Your cards:</p>
 				{gameState.cards.map((card, i) => (
-					<label key={card.rank+' '+suitChars[card.suit]}>
+					<label key={card.rank+' '+card.suit}>
 						<input
 							type="checkbox"
 							checked={cardSelected[i] || false}
@@ -137,7 +137,7 @@ export default function Game() {
 								setCardSelected(cardSelected2);
 							}}
 						/>
-						{card.rank+' '+card.suit}
+						{card.rank+' '+suitChars[card.suit]}
 					</label>
 				))}
 				<button
