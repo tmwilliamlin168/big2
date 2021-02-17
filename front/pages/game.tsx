@@ -14,6 +14,8 @@ interface GameState {
 	playerTurn: string
 }
 
+const suitChars = ['♣', '♦', '♥', '♠'];
+
 export default function Game() {
 	const [socket, setSocket] = useState<SocketIOClient.Socket | null>(null);
 	const [connected, setConnected] = useState(false);
@@ -116,7 +118,7 @@ export default function Game() {
 				<p>Last played:</p>
 				{gameState.lastPlayed ? (
 					<>
-						{gameState.lastPlayed.map((card, i) => <span key={i}>{card.rank+' '+card.suit}</span>)}
+						{gameState.lastPlayed.map((card, i) => <span key={i}>{card.rank+' '+suitChars[card.suit]+'|'}</span>)}
 						{` by ${gameState.lastPlayedPlayer}`}
 					</>
 				) : '(Nothing)'}
@@ -125,7 +127,7 @@ export default function Game() {
 			<div>
 				<p>Your cards:</p>
 				{gameState.cards.map((card, i) => (
-					<label key={card.rank+' '+card.suit}>
+					<label key={card.rank+' '+suitChars[card.suit]}>
 						<input
 							type="checkbox"
 							checked={cardSelected[i] || false}
