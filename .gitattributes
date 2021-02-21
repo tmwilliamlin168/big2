@@ -1,4 +1,5 @@
 *.css text
-*.js text
+*.ts text
+*.tsx text
 *.json text
 *.md text
